@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Технологии{% endblock %}
+{% block content %}
+{% load user_filters %}
+  <main role="main" class="container">
+      <div class="row">
+          <!-- Левый вспомогательный блок -->
+          <div class="col-md-3 mb-3 mt-1">
+              <div class="card">
+                  <div class="card-body">
+                      <ul class="list-group list-group-flush">
+                          <li class="list-group-item">
+                              <div class="h3">
+                                  Технологии
+                              </div> 
+                          </li>
+                          <li class="list-group-item">
+                              <div class="h6 text-muted">
+                                  <p>Ссылки:</p>
+                                  <p><a class="btn btn-primary btn-block" href="https://code.visualstudio.com/">VSCode</a></p>
+                                  <p><a class="btn btn-warning btn-block" href="https://www.python.org/">Python</a></p>
+                                  <p><a class="btn btn-success btn-block" href="https://www.djangoproject.com/">Django</a></p>
+                                  <p><a class="btn btn-dark btn-block" href="https://getbootstrap.com/">Bootstrap</a></p>
+                              </div>
+                          </li>
+                      </ul>                                               
+                  </div>                    
+              </div>                
+          </div>
+          <!-- Тело страницы -->
+          <div class="col-md-9">
+              <div class="card-body">                    
+                  <div class="card-text">
+                        <h1>Этот проект появился благодаря:</h1>
+                        <h5>Редактору кода:</h5>
+                        <h3>VSCode</h3>
+                        <p>Отличный редактор кода, есть все необходимое</p>
+                        <h5>Языку программирования:</h5>
+                        <h3>Python</h3>
+                        <p>Конкретно версия Python 3.9</p>
+                        <h5>Фреймворку:</h5>
+                        <h3>Django</h3>
+                        <p>Версия 2.2</p>
+
+                        <h3>На текущий момент я изучаю и неплохо понимаю:</h3>
+                        <ul>
+                            <li>Python</li>
+                            <li>Django</li>
+                            <li>Bootstrap 4</li>
+                            <li>HTML/CSS</li>
+                        </ul>
+
+                        <h3>Нужно ещё изучить:</h3>
+                        <ul>
+                            <li>JavaScript</li>
+                            <li>RestAPI</li>
+                        </ul>
+                  </div>                    
+              </div>                
+          </div>            
+      </div>        
+  </main>
+{% endblock %} 

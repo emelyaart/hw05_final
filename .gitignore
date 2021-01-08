@@ -3,6 +3,9 @@ env/
 venv/
 .venv
 .venv/
+.vscode/
+.idea/
+.mypy_cache/
 
 __pycache__/
 *.py[cod]
@@ -17,6 +20,13 @@ __pycache__/
 
 static/
 posts/static/
+sent_emails/
 media/
 
 db.sqlite3
+
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover 
