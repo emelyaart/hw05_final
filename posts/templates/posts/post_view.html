@@ -1,5 +1,5 @@
 {% extends 'base.html' %} 
-{% block title %}Профиль пользователя {{ author.username }}{% endblock %} 
+{% block title %}Профиль пользователя {{ profile.username }}{% endblock %} 
 {% block content %}
 {% load user_filters %}
 <main role="main" class="container">
@@ -7,14 +7,29 @@
         <div class="col-md-3 mb-3 mt-1">
             <div class="card">
                 <div class="card-body">
-                    <div class="h2">{{ author.get_full_name }}</div>
-                    <div class="h3 text-muted">@{{ author.username }}</div>
+                    <div class="h2">{{ profile.get_full_name }}</div>
+                    <div class="h3 text-muted">@{{ profile.username }}</div>
                 </div>
                 <ul class="list-group list-group-flush">
+                    {% if user.username != profile.username %}
+                    <li class="list-group-item">
+                    {% if follow.is_following %}
+                        <a href="{% url 'posts:profile_unfollow' profile.username %}" 
+                           class="btn btn-lg btn-light">
+                           Отписаться
+                        </a>
+                    {% else %}
+                        <a href="{% url 'posts:profile_follow' profile.username %}" 
+                           class="btn btn-lg btn-primary">            
+                           Подписаться
+                        </a>
+                    {% endif %}
+                    </li>
+                    {% endif %}
                     <li class="list-group-item">
                         <div class="h6 text-muted">
-                            Подписчиков: XXX <br />
-                            Подписан: XXX
+                            Подписчиков: {{ follow.following }} <br />
+                            Подписан: {{ follow.follower }}
                         </div>
                     </li>
                     <li class="list-group-item">
@@ -31,16 +46,16 @@
             {% endthumbnail %}
                 <div class="card-body">
                     <p class="card-text">
-                        <a href="{% url 'posts:profile' author.username %}">
-                            <strong class="d-block text-gray-dark">@{{ author.username }}</strong>
+                        <a href="{% url 'posts:profile' profile.username %}">
+                            <strong class="d-block text-gray-dark">@{{ profile.username }}</strong>
                         </a>
                         {{ post.text }}
                     </p>
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
-                            {% if user.username == author.username %}
+                            {% if user.username == profile.username %}
                             <a  class="btn btn-sm text-muted"
-                                href="{% url 'posts:post_edit' author.username post.id %}"
+                                href="{% url 'posts:post_edit' profile.username post.id %}"
                                 role="button">Редактировать</a>
                             {% endif %}
                         </div>
