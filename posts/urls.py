@@ -5,7 +5,6 @@ from . import views
 app_name = 'posts'
 
 urlpatterns = [
-    path('', views.index, name='index'),
     path('group/<slug:slug>/', views.group_posts, name='group'),
     path('new/', views.new_post, name='new_post'),
     path('follow/', views.follow_index, name='follow_index'),
@@ -18,5 +17,6 @@ urlpatterns = [
     path('<str:username>/follow/',
          views.profile_follow, name='profile_follow'),
     path('<str:username>/unfollow/',
-         views.profile_unfollow, name='profile_unfollow')
+         views.profile_unfollow, name='profile_unfollow'),
+    path('', views.index, name='index')
 ]
