@@ -11,15 +11,15 @@ class PostsURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user_author = User.objects.create_user(
+        cls.user1 = User.objects.create_user(
             username='author')
-        cls.user_non_author = User.objects.create_user(
+        cls.user2 = User.objects.create_user(
             username='non_author')
-        Post.objects.create(
+        cls.post = Post.objects.create(
             text='а' * 100,
-            author=cls.user_author
+            author=cls.user1
         )
-        Group.objects.create(
+        cls.group = Group.objects.create(
             title='test_group',
             slug='test-slug',
             description='c' * 50
@@ -29,30 +29,34 @@ class PostsURLTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(
-            PostsURLTests.user_author
+            PostsURLTests.user1
         )
         self.authorized_client_1 = Client()
         self.authorized_client_1.force_login(
-            PostsURLTests.user_non_author
+            PostsURLTests.user2
         )
         self.urls = {
             'availabel_all_users': [
-                    '/',
-                    '/group/test-slug/',
-                    '/author/',
-                    '/author/1/'
+                '/',
+                f'/group/{PostsURLTests.group.slug}/',
+                f'/{PostsURLTests.user1.username}/',
+                f'/{PostsURLTests.user1.username}/{PostsURLTests.post.id}/'
             ],
             'availabel_authorized_users': [
-                    '/new/',
-                    '/author/1/edit/'
+                '/new/',
+                (f'/{PostsURLTests.user1.username}/'
+                 f'{PostsURLTests.post.id}/edit/')
             ],
             'used_correct_templated': {
-                    '/': 'index.html',
-                    '/new/': 'posts/new_post.html',
-                    '/group/test-slug/': 'group.html',
-                    '/author/': 'posts/profile.html',
-                    '/author/1/': 'posts/post_view.html',
-                    '/author/1/edit/': 'posts/new_post.html'
+                '/': 'index.html',
+                '/new/': 'posts/new_post.html',
+                f'/group/{PostsURLTests.group.slug}/': 'group.html',
+                f'/{PostsURLTests.user1.username}/': 'posts/profile.html',
+                f'/{PostsURLTests.user1.username}/{PostsURLTests.post.id}/':
+                'posts/post_view.html',
+                (f'/{PostsURLTests.user1.username}/'
+                 f'{PostsURLTests.post.id}/edit/'):
+                'posts/new_post.html'
             }
         }
 
@@ -92,11 +96,15 @@ class PostsURLTests(TestCase):
         """
         Страница перенаправляет авторизованного НЕ автора поста
         """
-        response = self.authorized_client_1.get('/author/1/edit/')
+        response = self.authorized_client_1.get(
+                    (f'/{PostsURLTests.user1.username}/'
+                     f'{PostsURLTests.post.id}/edit/')
+                    )
         self.assertRedirects(
-            response,
-            '/author/1/'
-            )
+                    response,
+                    (f'/{PostsURLTests.user1.username}/'
+                     f'{PostsURLTests.post.id}/')
+                )
 
     def test_urls_uses_correct_template(self):
         """

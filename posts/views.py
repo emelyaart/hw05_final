@@ -1,12 +1,9 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CommentForm, PostForm
-from .models import Follow, Group, Post
-
-User = get_user_model()
+from .models import Follow, Group, Post, User
 
 
 def index(request):
@@ -57,10 +54,7 @@ def follow_index(request):
     """
     Выводит ленту постов подписок
     """
-    users = request.user.follower.all()
-    post_list = []
-    for user in users:
-        post_list += user.author.posts.all()
+    post_list = Post.objects.filter(author__following__user=request.user)
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -115,7 +109,7 @@ def new_post(request, post=None):
     Проверяет форму на валидность и делает запись в БД.
     """
     form = PostForm(request.POST or None)
-    if request.method == 'GET' or not form.is_valid():
+    if not form.is_valid():
         return render(request, 'posts/new_post.html', {'form': form})
 
     post = form.save(commit=False)
@@ -131,7 +125,7 @@ def post_view(request, username, post_id):
     """
     post = get_object_or_404(Post, pk=post_id, author__username=username)
     comments = post.comments.all()
-    form = CommentForm(request.POST or None)
+    form = CommentForm()
     count = post.author.posts.count()
     follow = {
         'follower_count': post.author.follower.count(),
@@ -205,7 +199,7 @@ def add_comment(request, username, post_id):
     """
     post = get_object_or_404(Post, pk=post_id, author__username=username)
     form = CommentForm(request.POST or None)
-    if request.method == 'GET' or not form.is_valid():
+    if not form.is_valid():
         return redirect('posts:post', username=username, post_id=post_id)
 
     comment = form.save(commit=False)

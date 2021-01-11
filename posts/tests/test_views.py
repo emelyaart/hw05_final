@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from posts.models import Group, Post, Follow
+from posts.models import Follow, Group, Post
 
 User = get_user_model()
 
@@ -299,9 +299,8 @@ class PostsViewsTest(TestCase):
         self.assertEqual(post[0].text, 'Текст-follow')
 
         response = self.auth_client_alt.get(reverse('posts:follow_index'))
-        post = response.context.get('page').object_list
 
-        self.assertEqual(post, [])
+        self.assertFalse(response.context.get('page').object_list.exists())
 
     def test_auth_user_can_comment_on_posts(self):
         """Только авторизованный пользователь может комментирорвать посты"""

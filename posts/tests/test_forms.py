@@ -19,7 +19,7 @@ class PostFormTests(TestCase):
         super().setUpClass()
         settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.user = User.objects.create_user(username='username')
-        Post.objects.create(
+        cls.post = Post.objects.create(
             text='Текст',
             author=cls.user
         )
@@ -78,12 +78,12 @@ class PostFormTests(TestCase):
 
         response = self.authorized_client.post(
             reverse('posts:post_edit', kwargs={
-                'username': 'username',
-                'post_id': 1
+                'username': PostFormTests.user,
+                'post_id': PostFormTests.post.id
             }),
             data=form_data,
             follow=True
         )
-        post = Post.objects.get(pk=1)
-        self.assertEqual(post.text, 'Изменённый текст')
+        post = Post.objects.get(pk=PostFormTests.post.id)
+        self.assertEqual(post.text, form_data['text'])
         self.assertEqual(response.status_code, 200)
