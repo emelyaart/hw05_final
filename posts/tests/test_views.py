@@ -4,10 +4,9 @@ import tempfile
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.paginator import Paginator
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from posts.models import Group, Post, Follow
@@ -225,12 +224,22 @@ class PostsViewsTest(TestCase):
         self.assertEqual(response.context.get('post').image,
                          'posts/small.gif')
 
+    @override_settings(
+        CACHES={
+            'default': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            }
+        }
+    )
     def test_cache_index_page(self):
         """Тестируем cache"""
-        response = self.auth_client.get(reverse('posts:index'))
-        post = response.context.get('page').object_list
-        cache.set('index_page', post[0].text, 10)
-        self.assertEqual(cache.get('index_page'), post[0].text)
+        index_one = self.client.get(reverse('posts:index'))
+        Post.objects.create(
+                text='Test-cache',
+                author=PostsViewsTest.user
+            )
+        index_two = self.client.get(reverse('posts:index'))
+        self.assertHTMLEqual(str(index_one), str(index_two))
 
     def test_authenticated_user_can_profile_follow_and_unfollow(self):
         """
