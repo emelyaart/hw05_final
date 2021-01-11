@@ -10,7 +10,7 @@ from django.core.paginator import Paginator
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Group, Post
+from posts.models import Group, Post, Follow
 
 User = get_user_model()
 
@@ -42,6 +42,12 @@ class PostsViewsTest(TestCase):
         )
         cls.user = User.objects.create_user(
                 username='username'
+        )
+        cls.user1 = User.objects.create_user(
+                username='username1'
+        )
+        cls.user2 = User.objects.create_user(
+                username='username2'
         )
 
         cls.group_1 = Group.objects.create(
@@ -78,7 +84,10 @@ class PostsViewsTest(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.client.force_login(PostsViewsTest.user)
+        self.auth_client = Client()
+        self.auth_client_alt = Client()
+        self.auth_client.force_login(PostsViewsTest.user)
+        self.auth_client_alt.force_login(PostsViewsTest.user2)
         self.form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField
@@ -98,7 +107,7 @@ class PostsViewsTest(TestCase):
 
         for template, reverse_name in template_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
-                response = self.client.get(reverse_name)
+                response = self.auth_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
     def test_paginator_first_page_contains_ten_records(self):
@@ -106,7 +115,7 @@ class PostsViewsTest(TestCase):
         Паджинатор /index соответствует ожиданиям
         возвращает 10 записей на первой странице
         """
-        response = self.client.get(reverse('posts:index'))
+        response = self.auth_client.get(reverse('posts:index'))
         self.assertEqual(len(response.context.get('page').object_list), 10)
 
     def test_paginator_second_page_contains_three_records(self):
@@ -116,14 +125,14 @@ class PostsViewsTest(TestCase):
         """
         url = reverse('posts:index')
         url += '?page=2'
-        response = self.client.get(url)
+        response = self.auth_client.get(url)
         self.assertEqual(len(response.context.get('page').object_list), 8)
 
     def test_index_page_contains_context(self):
         """
         Контекст /index соответствует ожиданиям
         """
-        response = self.client.get(reverse('posts:index'))
+        response = self.auth_client.get(reverse('posts:index'))
         post = response.context.get('page').object_list
         self.assertEqual(post[0].text, 'Текст-image')
         self.assertEqual(post[0].author, PostsViewsTest.user)
@@ -133,7 +142,7 @@ class PostsViewsTest(TestCase):
         """
         Контекст /group соответствует ожиданиям
         """
-        response = self.client.get(
+        response = self.auth_client.get(
             reverse('posts:group', kwargs={'slug': 'test-slug'})
         )
         post = response.context.get('page').object_list
@@ -148,7 +157,7 @@ class PostsViewsTest(TestCase):
         """
         Пост не попал не в ту группу
         """
-        response = self.client.get(
+        response = self.auth_client.get(
             reverse('posts:group', kwargs={'slug': 'test-slug_2'})
         )
         self.assertEqual(len(response.context.get('page').object_list), 0)
@@ -157,7 +166,7 @@ class PostsViewsTest(TestCase):
         """
         Контекст /new_page соответсвует ожиданиям
         """
-        response = self.client.get(reverse('posts:new_post'))
+        response = self.auth_client.get(reverse('posts:new_post'))
 
         for value, expected in self.form_fields.items():
             with self.subTest(value=value):
@@ -168,7 +177,7 @@ class PostsViewsTest(TestCase):
         """
         Страница post_edit содержит ожидаемый контекст
         """
-        response = self.client.get(
+        response = self.auth_client.get(
             reverse(
                 'posts:post_edit', kwargs={
                     'username': PostsViewsTest.user.username,
@@ -187,7 +196,7 @@ class PostsViewsTest(TestCase):
         """
         Страница profile содержит ожидаемый контекст
         """
-        response = self.client.get(
+        response = self.auth_client.get(
             reverse(
                 'posts:profile', kwargs={
                     'username': PostsViewsTest.user.username
@@ -203,10 +212,10 @@ class PostsViewsTest(TestCase):
         """
         Страница post_view содержит ожидаемый контекст
         """
-        response = self.client.get(
+        response = self.auth_client.get(
             reverse(
                 'posts:post', kwargs={
-                    'username': 'username',
+                    'username': PostsViewsTest.user.username,
                     'post_id': 18
                 }
             ))
@@ -218,7 +227,83 @@ class PostsViewsTest(TestCase):
 
     def test_cache_index_page(self):
         """Тестируем cache"""
-        response = self.client.get(reverse('posts:index'))
+        response = self.auth_client.get(reverse('posts:index'))
         post = response.context.get('page').object_list
         cache.set('index_page', post[0].text, 10)
         self.assertEqual(cache.get('index_page'), post[0].text)
+
+    def test_authenticated_user_can_profile_follow_and_unfollow(self):
+        """
+        Авторизованный пользователь может подписываться и отписываться
+        на других пользователей
+        """
+        self.auth_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={
+                    'username': PostsViewsTest.user1.username,
+                }
+            )
+        )
+        self.assertTrue(
+            Follow.objects.filter(
+                user=PostsViewsTest.user,
+                author=PostsViewsTest.user1
+            ).exists()
+        )
+
+        self.auth_client.get(
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={
+                    'username': PostsViewsTest.user1.username,
+                }
+            )
+        )
+        self.assertFalse(Follow.objects.filter(
+                                user=PostsViewsTest.user,
+                                author=PostsViewsTest.user1
+                            ).exists())
+
+    def test_record_appears_in_the_subscription_feed(self):
+        """Новая запись появляется в ленте тех, кто подписан
+        и не появляется в ленте тех кто не подписа"""
+        self.auth_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={
+                    'username': PostsViewsTest.user1.username,
+                }
+            )
+        )
+
+        Post.objects.create(
+                text='Текст-follow',
+                author=PostsViewsTest.user1,
+                group=PostsViewsTest.group_1,
+                image=PostsViewsTest.test_image
+            )
+
+        response = self.auth_client.get(reverse('posts:follow_index'))
+        post = response.context.get('page').object_list
+
+        self.assertEqual(post[0].text, 'Текст-follow')
+
+        response = self.auth_client_alt.get(reverse('posts:follow_index'))
+        post = response.context.get('page').object_list
+
+        self.assertEqual(post, [])
+
+    def test_auth_user_can_comment_on_posts(self):
+        """Только авторизованный пользователь может комментирорвать посты"""
+        url = reverse(
+                'posts:add_comment', kwargs={
+                    'username': PostsViewsTest.user1.username,
+                    'post_id': 18
+                }
+            )
+        response = self.client.get(url)
+        self.assertRedirects(
+                    response,
+                    f'/auth/login/?next={url}'
+                )
