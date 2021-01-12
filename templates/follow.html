@@ -5,15 +5,9 @@
     <div class="container">
         {% include "menu.html" with follow=True %}
            <h1>Избранное</h1>
-           {% load cache %}
-           {% cache 20 follow_page %}
-            {% if is_empty %}
-                <h3>Вы не подписаны ни на одного автора.</h3>
-            {% endif %}
                 {% for post in page %}
                     {% include "posts/post_item.html" with post=post %}
                 {% endfor %}
-            {% endcache %}
     </div>
 
         {% if page.has_other_pages %}

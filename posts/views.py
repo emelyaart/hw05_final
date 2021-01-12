@@ -103,12 +103,12 @@ def profile(request, username):
 
 
 @login_required
-def new_post(request, post=None):
+def new_post(request):
     """
     Функция создания новой записи в блог.
     Проверяет форму на валидность и делает запись в БД.
     """
-    form = PostForm(request.POST or None)
+    form = PostForm(request.POST or None, files=request.FILES or None)
     if not form.is_valid():
         return render(request, 'posts/new_post.html', {'form': form})
 
