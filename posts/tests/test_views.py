@@ -220,7 +220,7 @@ class PostsViewsTest(TestCase):
             ))
         self.assertEqual(response.context.get('post').text, 'Текст-image')
         self.assertEqual(response.context.get('author'), PostsViewsTest.user)
-        self.assertEqual(response.context.get('post_count'), 18)
+        self.assertEqual(response.context.get('counters')['post_count'], 18)
         self.assertEqual(response.context.get('post').image,
                          'posts/small.gif')
 

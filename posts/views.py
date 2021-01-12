@@ -80,15 +80,16 @@ def profile(request, username):
     paginator = Paginator(author_posts_list, 5)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    follow = {
+    counters = {
         'follower_count': author.follower.count(),
         'following_count': author.following.count(),
-        'is_following': False
+        'post_count': paginator.count
     }
+    is_follow = False
     if (request.user.is_authenticated
         and Follow.objects.filter(user=request.user,
                                   author=author).exists()):
-        follow['is_following'] = True
+        is_follow = True
 
     return render(
                 request,
@@ -97,7 +98,8 @@ def profile(request, username):
                     'page': page,
                     'author': author,
                     'paginator': paginator,
-                    'follow': follow,
+                    'counters': counters,
+                    'is_follow': is_follow
                 }
             )
 
@@ -126,16 +128,17 @@ def post_view(request, username, post_id):
     post = get_object_or_404(Post, pk=post_id, author__username=username)
     comments = post.comments.all()
     form = CommentForm()
-    count = post.author.posts.count()
-    follow = {
+    counters = {
         'follower_count': post.author.follower.count(),
         'following_count': post.author.following.count(),
-        'is_following': False
+        'post_count': post.author.posts.count()
     }
+    is_follow = False
+
     if (request.user.is_authenticated
         and Follow.objects.filter(user=request.user,
                                   author=post.author).exists()):
-        follow['is_following'] = True
+        is_follow = True
 
     return render(
                 request,
@@ -143,10 +146,10 @@ def post_view(request, username, post_id):
                 {
                     'post': post,
                     'author': post.author,
-                    'post_count': count,
+                    'counters': counters,
                     'comments': comments,
                     'form': form,
-                    'follow': follow
+                    'is_follow': is_follow
                 }
             )
 
