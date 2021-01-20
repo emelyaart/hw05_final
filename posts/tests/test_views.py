@@ -13,19 +13,21 @@ from posts.models import Follow, Group, Post
 
 User = get_user_model()
 
+MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
+
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class PostsViewsTest(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+        shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         small_gif = (
                 b'\x47\x49\x46\x38\x39\x61\x02\x00'
                 b'\x01\x00\x80\x00\x00\x00\x00\x00'
@@ -224,13 +226,6 @@ class PostsViewsTest(TestCase):
         self.assertEqual(response.context.get('post').image,
                          'posts/small.gif')
 
-    @override_settings(
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-            }
-        }
-    )
     def test_cache_index_page(self):
         """Тестируем cache"""
         index_one = self.client.get(reverse('posts:index'))
@@ -239,7 +234,7 @@ class PostsViewsTest(TestCase):
                 author=PostsViewsTest.user
             )
         index_two = self.client.get(reverse('posts:index'))
-        self.assertHTMLEqual(str(index_one), str(index_two))
+        self.assertHTMLEqual(str(index_one.content), str(index_two.content))
 
     def test_authenticated_user_can_profile_follow_and_unfollow(self):
         """
