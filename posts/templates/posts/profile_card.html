@@ -1,36 +1,48 @@
+{% load static %} 
 <div class="col-md-3 mb-3 mt-1">
     <div class="card">
         <div class="card-body">
-            <div class="h2">{{ author.get_full_name}}</div>
-            <div class="h3 text-muted">@{{ author.username }}</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div>
+                        <img
+                            src="{% static 'images/svg/ava-boy.svg' %}"
+                            alt="My photo"
+                            class="img-thumbnail rounded-circle"
+                        />
+                    </div>
+                    <div class="h3 text-center">{{ author.get_full_name}}</div>
+                    <div class="h5 text-muted text-center">@{{ author.username }}</div>
+                </li>
+                {% if user.username != author.username %}
+                <li class="list-group-item">
+                    {% if is_follow %}
+                    <a
+                        href="{% url 'posts:profile_unfollow' author.username %}"
+                        class="btn btn-sm btn-block btn-light"
+                    >
+                        Отписаться
+                    </a>
+                    {% else %}
+                    <a
+                        href="{% url 'posts:profile_follow' author.username %}"
+                        class="btn btn-sm btn-block btn-danger"
+                    >
+                        Подписаться
+                    </a>
+                    {% endif %}
+                </li>
+            {% endif %}
+                <li class="list-group-item text-center">
+                    <div class="h6 text-muted">
+                        Подписчиков - {{ counters.following_count }}<br />
+                        Подписан - {{ counters.follower_count }}
+                    </div>
+                    <div class="h6 text-muted">
+                        Записей - {{ counters.post_count }}
+                    </div>
+                </li>
+            </ul>
         </div>
-        <ul class="list-group list-group-flush">
-            {% if user.username != author.username %}
-            <li class="list-group-item">
-            {% if is_follow %}
-                <a href="{% url 'posts:profile_unfollow' author.username %}" 
-                   class="btn btn-lg btn-light">
-                   Отписаться
-                </a>
-            {% else %}
-                <a href="{% url 'posts:profile_follow' author.username %}" 
-                   class="btn btn-lg btn-primary">            
-                   Подписаться
-                </a>
-            {% endif %}
-            </li>
-            {% endif %}
-            <li class="list-group-item">
-                <div class="h6 text-muted">
-                    Подписчиков: {{ counters.following_count }}<br />
-                    Подписан: {{ counters.follower_count }}
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class="h6 text-muted">
-                    Записей: {{ counters.post_count }}
-                </div>
-            </li>
-        </ul>
     </div>
 </div>

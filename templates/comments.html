@@ -9,7 +9,7 @@
             <div class="form-group">
                 {{ form.text|addclass:"form-control" }}
             </div>
-            <button type="submit" class="btn btn-primary">Отправить</button>
+            <button type="submit" class="btn btn-danger">Отправить</button>
         </div>
     </form>
 </div>
@@ -18,13 +18,13 @@
 {% for item in comments %}
 <div class="media card mb-4">
     <div class="media-body card-body">
-        <h5 class="mt-0">
-            <a href="{% url 'posts:profile' item.author.username %}"
-               name="comment_{{ item.id }}">
-                @{{ item.author.username }}
+        <p>
+            <a class="card-title text-danger"
+                href="{% url 'posts:profile' item.author.username %}"
+                name="comment_{{ item.id }}">
+                    <strong class="d-block ">@{{ item.author.username }}</strong>
             </a>
-        </h5>
-        <p>{{ item.text | linebreaksbr }}</p>
+        {{ item.text | linebreaksbr }}</p>
     </div>
 </div>
 {% endfor %}

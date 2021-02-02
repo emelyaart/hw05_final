@@ -1,14 +1,56 @@
-<nav class="navbar navbar-light" style="background-color: #e3f2fd">
-    <a href="/" class="navbar-brand"><span style="color: red">Ya</span>tube</a>
-    <nav class="my-2 my-md-0 mr-md-3">
+{% comment %}
+        <a href="{% url 'posts:new_post' %}" class="p-2 text-light">Новая запись</a>
+        <a href="{% url 'password_change' %}" class="p-2 text-light">Изменить пароль</a>
+ {% endcomment %}
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark flex-md-nowrap py-1 px-3 shadow">
+	<a href="{% url 'posts:index' %}" class="navbar-brand col-sm-3 col-md-2 mr-0"><span style="color: red">Ya</span>tube</a>		
+	<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+	<div id="navbarCollapse" class="collapse navbar-collapse justify-content-end">
+		<form class="navbar-form form-inline">
+			<div class="input-group search-box">								
+				<input type="text" id="search" class="form-control" placeholder="Найти...">
+				<div class="input-group-append">
+					<span class="input-group-text">
+						<i class="fas fa-search"></i>
+					</span>
+				</div>
+			</div>
+		</form>
+		<div class="navbar-nav ml-5 action-buttons">
         {% if user.is_authenticated %}
-        <a href="{% url 'posts:profile' user.username %}" class="p-2 text-dark" >Мой профиль: {{ user.username }}.</a>
-        <a href="{% url 'posts:new_post' %}" class="p-2 text-dark">Новая запись</a>
-        <a href="{% url 'password_change' %}" class="p-2 text-dark">Изменить пароль</a>
-        <a href="{% url 'logout' %}" class="p-2 text-dark">Выйти</a>
+            <div class="nav-item">
+				<a href="{% url 'posts:new_post' %}" class="btn btn-danger mr-4 text-light">
+                    <i class="fas fa-plus"></i>
+                    Добавить запись
+                </a>
+			</div>
+            <div class="nav-item dropdown">
+				<a href="#" 
+                   class="nav-link dropdown-toggle mr-4 "
+                   data-toggle='dropdown'
+                   role="button"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    {{ user.username }}
+                </a>
+                <div class="dropdown-menu">
+                    <a href="{% url 'posts:profile' user.username %}" class="dropdown-item">Перейти в профиль</a>
+                    <a href="{% url 'password_change' %}" class="dropdown-item">Изменить пароль</a>
+                </div>
+			</div>
+            <div class="nav-item">
+				<a href="{% url 'logout' %}" class="nav-link mr-4">Выйти</a>
+			</div>
         {% else %}
-        <a href="{% url 'login' %}" class="p-2 text-dark">Войти</a> |
-        <a href="{% url 'users:signup' %}" class="p-2 text-dark">Регистрация</a>
+            <div class="nav-item">
+				<a href="{% url 'login' %}" class="nav-link mr-4">Войти</a>
+			</div>
+			<div class="nav-item">
+				<a href="{% url 'users:signup' %}" class="btn btn-danger text-light">Регистрация</a>
+			</div>
         {% endif %}
-    </nav>
+        </div>
+	</div>
 </nav>

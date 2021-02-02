@@ -1,5 +1,5 @@
 {% extends 'base.html' %} 
-{% block title %}{% if edit %}Изменить{% else%}Новая{% endif %} запись{% endblock %} 
+{% block title %}{% if is_edit %}Изменить{% else%}Новая{% endif %} запись{% endblock %} 
 {% block content %} 
 {% load user_filters %}
 <main role="main" class="container">
@@ -7,7 +7,7 @@
         <div class="col-md-8 p-5">
             <div class="card">
                 <div class="card-header">
-                    {% if edit %}Редактирование{% else %}Создание новой{% endif %} записи
+                    {% if is_edit %}Редактирование{% else %}Создание новой{% endif %} записи
                 </div>
                 <div class="card-body">
                     {% for error in form.errors %}
@@ -57,8 +57,8 @@
                         {% endfor %}
 
                         <div class="col-md-6 offset-md-4">
-                            <button class="btn btn-primary" type="submit">
-                                {% if edit %}Сохранить{% else %}Опубликовать{% endif %}
+                            <button class="btn btn-danger" type="submit">
+                                {% if is_edit %}Сохранить{% else %}Опубликовать{% endif %}
                             </button>
                         </div>
                     </form>

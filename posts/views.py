@@ -207,7 +207,7 @@ def add_comment(request, username, post_id):
 
     comment = form.save(commit=False)
     comment.post = post
-    comment.author = post.author
+    comment.author = request.user
     comment.save()
 
     return redirect('posts:post', username=username, post_id=post_id)
