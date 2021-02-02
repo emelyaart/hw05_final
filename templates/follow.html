@@ -6,7 +6,7 @@
         {% include "menu.html" with follow=True %}
            <h1 class="text-center my-5">Избранное</h1>
            {% if paginator.count == 0 %}
-           <p class="text-center">{{ page.count }}Здесь пока ничего нет, подпишитесь хотя бы на одного автора</p>
+           <p class="text-center text-muted">{{ page.count }}Здесь пока ничего нет, подпишитесь хотя бы на одного автора</p>
            {% endif %}
                 {% for post in page %}
                     {% include "posts/post_item.html" with post=post %}
