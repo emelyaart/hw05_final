@@ -41,14 +41,14 @@
                 </div>
 			</div>
             <div class="nav-item">
-				<a href="" class="nav-link mr-4">Выйти</a>
+				<a href="{% url 'logout' %}" class="nav-link mr-4">Выйти</a>
 			</div>
         {% else %}
             <div class="nav-item">
 				<a href="{% url 'login' %}" class="nav-link mr-4">Войти</a>
 			</div>
 			<div class="nav-item">
-				<a href="{% url 'users:signup' %}" class="btn btn-danger text-light">Регистрация</a>
+				<a href="{% url 'signup' %}" class="btn btn-danger text-light">Регистрация</a>
 			</div>
         {% endif %}
         </div>
