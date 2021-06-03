@@ -4,17 +4,20 @@
 {% block content %}
     <div class="container">
         {% include "menu.html" with index=True %}
-           <h1> Последние обновления на сайте</h1>
-           {% load cache %}
-           {% cache 20 index_page %}
+            <h1 class="text-center my-5">Последние обновления</h1>
+            {% load cache %}
+            {% cache 20 index_page page %}
                 {% for post in page %}
                     {% include "posts/post_item.html" with post=post %}
                 {% endfor %}
             {% endcache %}
-    </div>
-
+        <div class="row">
         {% if page.has_other_pages %}
             {% include "paginator.html" with items=page paginator=paginator%}
         {% endif %}
+        </div>
+    </div>
+
+        
 
 {% endblock %} 

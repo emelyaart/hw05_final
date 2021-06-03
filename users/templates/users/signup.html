@@ -16,7 +16,7 @@
 
                     {% endfor %}
                 
-                <form action="{% url 'users:signup' %}">
+                <form  method="post" action="{% url 'signup' %}">
                     {% csrf_token %}
 
                     {% for field in form %}
@@ -39,7 +39,7 @@
                     {% endfor %}
                     
                     <div class="col-md-6 offset-md-4">
-                        <button class="btn btn-primary" type="submit">
+                        <button class="btn btn-danger" type="submit">
                             Зарегистрироваться
                         </button>
                     </div>

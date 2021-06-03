@@ -13,8 +13,9 @@
             {% endthumbnail %}
                 <div class="card-body">
                     <p class="card-text">
-                        <a href="{% url 'posts:profile' author.username %}">
-                            <strong class="d-block text-gray-dark">@{{ author.username }}</strong>
+                        <a href="{% url 'posts:profile' author.username %}"
+                           class="card-link text-danger">
+                            <strong class="d-block">@{{ author.username }}</strong>
                         </a>
                         {{ post.text }}
                     </p>
@@ -23,7 +24,9 @@
                             {% if user == author %}
                             <a  class="btn btn-sm text-muted"
                                 href="{% url 'posts:post_edit' author.username post.id %}"
-                                role="button">Редактировать</a>
+                                role="button">
+                                    <i class="far fa-edit"></i>
+                            </a>
                             {% endif %}
                         </div>
                         <small class="text-muted">{{ post.pub_date }}</small>
