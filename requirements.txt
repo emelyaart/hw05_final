@@ -15,7 +15,7 @@ click-didyoumean==0.0.3
 click-plugins==1.1.1
 click-repl==0.1.6
 decorator==4.4.2
-Django==2.2.6
+Django==2.2.20
 django-debug-toolbar==3.2.1
 django-filter==2.4.0
 dlib==19.22.0
